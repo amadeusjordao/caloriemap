@@ -8,177 +8,124 @@
     <style>
         body {
             margin: 0;
-            padding: 0;
             font-family: Arial, sans-serif;
-            background: #101820;
+            background-color: #f5f5f5;
+        }
+
+        header {
+            background: #6a5acd;
             color: white;
+            padding: 15px;
+            text-align: center;
+            font-size: 22px;
+            font-weight: bold;
         }
 
         .container {
             width: 90%;
-            max-width: 400px;
-            margin: 80px auto;
+            max-width: 420px;
+            background: white;
+            margin: 25px auto;
             padding: 20px;
-            background: #1b2635;
-            border-radius: 15px;
-            text-align: center;
+            border-radius: 12px;
+            box-shadow: 0px 0px 10px #0002;
         }
 
-        .hidden { display: none; }
-
-        input {
-            width: 90%;
+        input, button {
+            width: 100%;
             padding: 12px;
-            margin: 10px 0;
-            border: none;
+            margin-top: 10px;
             border-radius: 8px;
+            border: 1px solid #aaa;
+            font-size: 15px;
         }
 
         button {
-            width: 95%;
-            padding: 12px;
+            background: #6a5acd;
             border: none;
-            border-radius: 8px;
-            background: #ff7b00;
             color: white;
+            font-weight: bold;
             cursor: pointer;
-            margin-top: 10px;
-            font-size: 16px;
         }
 
-        button:hover { background: #ffa447; }
-
-        .logout {
-            margin-top: 20px;
-            background: #d63031;
+        button:hover {
+            background: #5847c0;
         }
 
-        .link {
+        .hidden {
+            display: none;
+        }
+
+        .result {
             margin-top: 15px;
-            cursor: pointer;
-            color: #00aaff;
+            padding: 15px;
+            background: #eee;
+            border-radius: 8px;
         }
     </style>
 </head>
 <body>
 
-    <!-- TELA DE LOGIN -->
-    <div class="container" id="login-screen">
-        <h1>CalorieMap</h1>
-        <h3>Login</h3>
+<header>CalorieMap</header>
 
-        <input type="email" id="login-email" placeholder="Email" />
-        <input type="password" id="login-password" placeholder="Senha" />
+<div class="container" id="loginBox">
+    <h3>Login</h3>
+    <input id="loginEmail" placeholder="Email" />
+    <input id="loginSenha" type="password" placeholder="Senha" />
+    <button onclick="login()">Entrar</button>
+    <button onclick="abrirCadastro()">Criar conta</button>
+</div>
 
-        <button onclick="login()">Entrar</button>
-        <p onclick="showRegister()" class="link">Criar conta</p>
-    </div>
+<div class="container hidden" id="cadastroBox">
+    <h3>Criar Conta</h3>
+    <input id="cadEmail" placeholder="Email" />
+    <input id="cadSenha" type="password" placeholder="Senha" />
+    <button onclick="cadastrar()">Cadastrar</button>
+    <button onclick="abrirLogin()">Voltar</button>
+</div>
 
-    <!-- TELA DE CADASTRO -->
-    <div class="container hidden" id="register-screen">
-        <h1>CalorieMap</h1>
-        <h3>Criar conta</h3>
+<div class="container hidden" id="home">
+    <h3>Buscar calorias</h3>
+    <input id="foodInput" placeholder="Digite o alimento..." />
+    <button onclick="buscarCalorias()">Calcular</button>
 
-        <input type="email" id="reg-email" placeholder="Email" />
-        <input type="password" id="reg-password" placeholder="Senha" />
+    <div id="result" class="result hidden"></div>
+</div>
 
-        <button onclick="register()">Cadastrar</button>
-        <p onclick="showLogin()" class="link">Já tenho conta</p>
-    </div>
+<script>
+    // ---- LOGIN / CADASTRO ----
+    function abrirCadastro() {
+        document.getElementById("loginBox").classList.add("hidden");
+        document.getElementById("cadastroBox").classList.remove("hidden");
+    }
 
-    <!-- TELA APP -->
-    <div class="container hidden" id="app-screen">
-        <h1>CalorieMap</h1>
-        <h3>Calcular Calorias com IA</h3>
+    function abrirLogin() {
+        document.getElementById("cadastroBox").classList.add("hidden");
+        document.getElementById("loginBox").classList.remove("hidden");
+    }
 
-        <input type="text" id="food-input" placeholder="Digite um alimento" />
+    function cadastrar() {
+        let email = document.getElementById("cadEmail").value;
+        let senha = document.getElementById("cadSenha").value;
 
-        <button onclick="analyzeFood()">Calcular</button>
-
-        <div id="result"></div>
-
-        <button class="logout" onclick="logout()">Sair</button>
-    </div>
-
-    <script>
-        // ---------- LOGIN ----------
-        function showRegister() {
-            document.getElementById("login-screen").classList.add("hidden");
-            document.getElementById("register-screen").classList.remove("hidden");
+        if (!email || !senha) {
+            alert("Preencha tudo");
+            return;
         }
 
-        function showLogin() {
-            document.getElementById("register-screen").classList.add("hidden");
-            document.getElementById("login-screen").classList.remove("hidden");
-        }
+        localStorage.setItem("user_email", email);
+        localStorage.setItem("user_senha", senha);
 
-        function login() {
-            let email = document.getElementById("login-email").value;
-            let password = document.getElementById("login-password").value;
+        alert("Conta criada!");
+        abrirLogin();
+    }
 
-            let savedEmail = localStorage.getItem("email");
-            let savedPass = localStorage.getItem("password");
+    function login() {
+        let email = document.getElementById("loginEmail").value;
+        let senha = document.getElementById("loginSenha").value;
 
-            if (email === savedEmail && password === savedPass) {
-                showApp();
-            } else {
-                alert("Email ou senha inválidos.");
-            }
-        }
-
-        function register() {
-            let email = document.getElementById("reg-email").value;
-            let password = document.getElementById("reg-password").value;
-
-            localStorage.setItem("email", email);
-            localStorage.setItem("password", password);
-
-            alert("Conta criada com sucesso!");
-            showLogin();
-        }
-
-        function showApp() {
-            document.getElementById("login-screen").classList.add("hidden");
-            document.getElementById("register-screen").classList.add("hidden");
-            document.getElementById("app-screen").classList.remove("hidden");
-        }
-
-        function logout() {
-            document.getElementById("app-screen").classList.add("hidden");
-            document.getElementById("login-screen").classList.remove("hidden");
-        }
-
-        // ---------- IA FAKE PARA CALORIAS ----------
-        function analyzeFood() {
-            let food = document.getElementById("food-input").value.trim().toLowerCase();
-            let result = document.getElementById("result");
-
-            if (food.length === 0) {
-                result.innerHTML = "<p>Digite um alimento.</p>";
-                return;
-            }
-
-            // base simples de calorias
-            const caloriesDB = {
-                "arroz": 130,
-                "feijão": 140,
-                "frango": 165,
-                "carne": 250,
-                "banana": 89,
-                "maçã": 52,
-                "ovo": 78,
-                "pão": 120,
-            };
-
-            let cal = caloriesDB[food] || Math.floor(Math.random() * 300) + 50;
-
-            result.innerHTML = `
-                <h3>Resultado:</h3>
-                <p><b>${food}</b> possui aproximadamente <b>${cal} kcal</b>.</p>
-                <p>(Estimado por IA)</p>
-            `;
-        }
-    </script>
-
-</body>
-</html>
+        if (
+            email === localStorage.getItem("user_email") &&
+            senha === localStorage.getItem("user_senha")
+        ) {
+            document.get
