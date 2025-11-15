@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CalorieMap</title>
+
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background: #101820;
+            color: white;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 400px;
+            margin: 80px auto;
+            padding: 20px;
+            background: #1b2635;
+            border-radius: 15px;
+            text-align: center;
+        }
+
+        .hidden { display: none; }
+
+        input {
+            width: 90%;
+            padding: 12px;
+            margin: 10px 0;
+            border: none;
+            border-radius: 8px;
+        }
+
+        button {
+            width: 95%;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            background: #ff7b00;
+            color: white;
+            cursor: pointer;
+            margin-top: 10px;
+            font-size: 16px;
+        }
+
+        button:hover { background: #ffa447; }
+
+        .logout {
+            margin-top: 20px;
+            background: #d63031;
+        }
+
+        .link {
+            margin-top: 15px;
+            cursor: pointer;
+            color: #00aaff;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- TELA DE LOGIN -->
+    <div class="container" id="login-screen">
+        <h1>CalorieMap</h1>
+        <h3>Login</h3>
+
+        <input type="email" id="login-email" placeholder="Email" />
+        <input type="password" id="login-password" placeholder="Senha" />
+
+        <button onclick="login()">Entrar</button>
+        <p onclick="showRegister()" class="link">Criar conta</p>
+    </div>
+
+    <!-- TELA DE CADASTRO -->
+    <div class="container hidden" id="register-screen">
+        <h1>CalorieMap</h1>
+        <h3>Criar conta</h3>
+
+        <input type="email" id="reg-email" placeholder="Email" />
+        <input type="password" id="reg-password" placeholder="Senha" />
+
+        <button onclick="register()">Cadastrar</button>
+        <p onclick="showLogin()" class="link">Já tenho conta</p>
+    </div>
+
+    <!-- TELA APP -->
+    <div class="container hidden" id="app-screen">
+        <h1>CalorieMap</h1>
+        <h3>Calcular Calorias com IA</h3>
+
+        <input type="text" id="food-input" placeholder="Digite um alimento" />
+
+        <button onclick="analyzeFood()">Calcular</button>
+
+        <div id="result"></div>
+
+        <button class="logout" onclick="logout()">Sair</button>
+    </div>
+
+    <script>
+        // ---------- LOGIN ----------
+        function showRegister() {
+            document.getElementById("login-screen").classList.add("hidden");
+            document.getElementById("register-screen").classList.remove("hidden");
+        }
+
+        function showLogin() {
+            document.getElementById("register-screen").classList.add("hidden");
+            document.getElementById("login-screen").classList.remove("hidden");
+        }
+
+        function login() {
+            let email = document.getElementById("login-email").value;
+            let password = document.getElementById("login-password").value;
+
+            let savedEmail = localStorage.getItem("email");
+            let savedPass = localStorage.getItem("password");
+
+            if (email === savedEmail && password === savedPass) {
+                showApp();
+            } else {
+                alert("Email ou senha inválidos.");
+            }
+        }
+
+        function register() {
+            let email = document.getElementById("reg-email").value;
+            let password = document.getElementById("reg-password").value;
+
+            localStorage.setItem("email", email);
+            localStorage.setItem("password", password);
+
+            alert("Conta criada com sucesso!");
+            showLogin();
+        }
+
+        function showApp() {
+            document.getElementById("login-screen").classList.add("hidden");
+            document.getElementById("register-screen").classList.add("hidden");
+            document.getElementById("app-screen").classList.remove("hidden");
+        }
+
+        function logout() {
+            document.getElementById("app-screen").classList.add("hidden");
+            document.getElementById("login-screen").classList.remove("hidden");
+        }
+
+        // ---------- IA FAKE PARA CALORIAS ----------
+        function analyzeFood() {
+            let food = document.getElementById("food-input").value.trim().toLowerCase();
+            let result = document.getElementById("result");
+
+            if (food.length === 0) {
+                result.innerHTML = "<p>Digite um alimento.</p>";
+                return;
+            }
+
+            // base simples de calorias
+            const caloriesDB = {
+                "arroz": 130,
+                "feijão": 140,
+                "frango": 165,
+                "carne": 250,
+                "banana": 89,
+                "maçã": 52,
+                "ovo": 78,
+                "pão": 120,
+            };
+
+            let cal = caloriesDB[food] || Math.floor(Math.random() * 300) + 50;
+
+            result.innerHTML = `
+                <h3>Resultado:</h3>
+                <p><b>${food}</b> possui aproximadamente <b>${cal} kcal</b>.</p>
+                <p>(Estimado por IA)</p>
+            `;
+        }
+    </script>
+
+</body>
+</html>
